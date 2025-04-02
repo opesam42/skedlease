@@ -5,11 +5,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
+from django.middleware.csrf import get_token
 # Create your views here.
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Prevent JWT from blocking it
 def create_user(request):
 
     serializer = UserRegistrationSerializer(data=request.data)
@@ -21,6 +24,7 @@ def create_user(request):
     #in case of validation error
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 def login_view(request):
     email = request.data.get('username')
@@ -29,19 +33,19 @@ def login_view(request):
     user = authenticate(email=email, password=password)
     
     if user:
-        login(request, user)
+        # this does the login JWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
         return Response({
             'message': 'Login successful',
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'role': user.user_role,
-            }
+            'access_token': access_token,
+            'refresh_token': str(refresh),
         })
     
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt #for testing
+
 @api_view(['POST'])
 def logout_user(request):
     logout(request)
@@ -57,3 +61,9 @@ def get_user_data(request):
         'email': request.user.email,
         'role': request.user.user_role
     })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Prevent JWT from blocking it
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return Response({"csrf_token": csrf_token})
