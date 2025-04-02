@@ -12,7 +12,7 @@ from django.middleware.csrf import get_token
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Prevent JWT from blocking it
+# @permission_classes([AllowAny])  # Prevent JWT from blocking it
 def create_user(request):
 
     serializer = UserRegistrationSerializer(data=request.data)
@@ -30,17 +30,20 @@ def login_view(request):
     email = request.data.get('username')
     password = request.data.get('password')
 
+    print(f"Received email: {email}, password: {password}")
+
     user = authenticate(email=email, password=password)
     
     if user:
-        # this does the login JWT
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
+        login(request, user)
 
         return Response({
             'message': 'Login successful',
-            'access_token': access_token,
-            'refresh_token': str(refresh),
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'role': user.user_role
+            }
         })
     
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
@@ -54,7 +57,7 @@ def logout_user(request):
 
 # Get User Data API (Requires Login)
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def get_user_data(request):
     return Response({
         'id': request.user.id,
