@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import USER_ROLE_CHOICES
+from .models import USER_ROLE_CHOICES, Patient, Doctor
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -22,4 +22,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         
         user = get_user_model() 
         new_user = user.objects.create_user(**validated_data)
+
+        user_role = validated_data.get('user_role')
+        if user_role == "patient":
+            Patient.objects.create(user=user)
+        elif user_role == "doctor":
+            Doctor.objects.create(user=user)
+            
         return new_user

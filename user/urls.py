@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+app_name = 'user'
 
 urlpatterns = [
     path('signup/', views.create_user, name='signup'),

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 from .managers import CustomUserManager
 
@@ -28,3 +29,17 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+class Doctor(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    speciality = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Dr. {self.user.first_name} {self.user.last_name}"
+
+class Patient(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    date_of_birth = models.DateField()
+
+    def __str__(self):
+        return f"Patient {self.user.first_name} {self.user.last_name}"

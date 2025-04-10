@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-5shc!x%(@m@@8s95jqxiohtr9uk*-^hl9eefn-3a3+^uy&1y#@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['skedlease.onrender.com']
+ALLOWED_HOSTS = ['skedlease.onrender.com', '127.0.0.1']
 
 
 # Application definition
@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'user',
+    'appointments',
     'rest_framework',
+    'drf_yasg',
 ]
 
 AUTH_USER_MODEL = 'user.CustomUser' # updated
@@ -173,3 +175,11 @@ CORS_ALLOW_HEADERS = [
     'X-CSRFToken',
     'Authorization',  
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        }
+    }
+}
