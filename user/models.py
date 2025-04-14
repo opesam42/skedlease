@@ -32,14 +32,14 @@ class CustomUser(AbstractUser):
     
 class Doctor(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    speciality = models.CharField(max_length=50)
+    speciality = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
 
 class Patient(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"Patient {self.user.first_name} {self.user.last_name}"
