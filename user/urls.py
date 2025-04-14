@@ -11,7 +11,7 @@ urlpatterns = [
     path('signup/', views.create_user, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_user, name='logout'),
-    path('user/', views.get_user_data, name='get_user_data'),
+    path('info/', views.get_user_data, name='get_user_data'),
 
     path('get_csrf/', views.get_csrf_token, name='get_csrf_token'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

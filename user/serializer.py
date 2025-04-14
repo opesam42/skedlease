@@ -25,8 +25,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
         user_role = validated_data.get('user_role')
         if user_role == "patient":
-            Patient.objects.create(user=user)
+            Patient.objects.create(user=new_user)
         elif user_role == "doctor":
-            Doctor.objects.create(user=user)
+            Doctor.objects.create(user=new_user)
             
         return new_user
