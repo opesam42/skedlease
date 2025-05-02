@@ -70,3 +70,4 @@ def get_user_data(request):
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return Response({"csrf_token": csrf_token})
+    
