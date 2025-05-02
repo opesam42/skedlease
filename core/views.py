@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-
+@login_required
 @api_view(['GET'])
 def get_doctors(request):
     doctors = Doctor.objects.all()
@@ -30,7 +30,7 @@ def get_doctors(request):
     serializers = DoctorSerializer(doctors, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
-# @login_required
+@login_required
 @api_view(['GET'])
 def view_appointments(request):
     appointments = Appointment.objects.all()
