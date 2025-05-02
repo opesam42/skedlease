@@ -28,13 +28,23 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-    
+
+
+class Speciality(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
 class Doctor(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     speciality = models.CharField(max_length=50, blank=True, null=True)
+    speciality = models.ManyToManyField(Speciality, related_name="doctor", blank=False)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
+
 
 class Patient(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
