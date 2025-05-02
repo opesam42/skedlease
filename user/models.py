@@ -19,7 +19,6 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=30, blank=False, null=False) 
     last_name = models.CharField(max_length=30, blank=False, null=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    phone_number = models.CharField(max_length=15)
     user_role = models.CharField(max_length=10, choices=USER_ROLE_CHOICES, default='patient')
 
     USERNAME_FIELD = 'email'
