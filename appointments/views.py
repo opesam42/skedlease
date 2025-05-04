@@ -4,11 +4,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializer import AppointmentSerializer
 from .models import Appointment
-from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 # Create your views here.
 
-@login_required
+
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_appointment(request):
     serializer = AppointmentSerializer(data=request.data)
 
@@ -19,8 +22,8 @@ def create_appointment(request):
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
 
-@login_required
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_appointment(request,id):
     try:
         appointment = Appointment.objects.get(id=id)
@@ -31,6 +34,6 @@ def update_appointment(request,id):
 
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)

@@ -72,6 +72,24 @@ def add_speciality(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def update_specialities(request, speciality_id):
+    try:
+        speciality = Speciality.objects.get(id=speciality_id)
+    except Speciality.DoesNotExist:
+        return Response({"message": "Speciality does not exist"}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = SpecialitySerializer(speciality, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_specialities(request):
