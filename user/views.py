@@ -9,8 +9,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
+from .models import Patient
 
 # Create your views here.
+User = get_user_model()
 
 @api_view(['POST'])
 def create_user(request):
@@ -31,12 +33,20 @@ def create_user(request):
 
 @api_view(['POST'])
 def login_view(request):
-    email = request.data.get('username')
+    identifier = request.data.get('username')
     password = request.data.get('password')
 
-    print(f"Received email: {email}, password: {password}")
+    try:
+        user = User.objects.get(email=identifier)
+    except User.DoesNotExist:
+        try:
+            patient = Patient.objects.get(matric_number=identifier)
+            user = patient.user
+        except Patient.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = authenticate(email=email, password=password)
+
+    user = authenticate(email=user.email, password=password)
     
     if user:
         login(request, user)
