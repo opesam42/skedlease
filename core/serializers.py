@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user.models import Doctor, Patient
+from user.models import Doctor, Patient, Speciality
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -14,7 +14,7 @@ class DoctorSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
     class Meta:
         model = Doctor
-        fields = ['id', 'user', 'speciality']
+        fields = ['id', 'user', 'specialities']
         read_only_fields = ['id']
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -22,3 +22,8 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ['id', 'user', 'matric_number']
         read_only_fields = ['id']
+
+class SpecialitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Speciality
+        fields = ['id', 'name', 'description']

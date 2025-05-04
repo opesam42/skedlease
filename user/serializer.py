@@ -45,6 +45,11 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         fields = BaseUserSerializer.Meta.fields + ['specialities']
 
+    def validate_specialities(self, value):
+        if len(value) > 2:
+            raise serializers.ValidationError("A doctor can have at most 2 specialities")
+        return value
+
     def create(self, validated_data):
         specialities = validated_data.pop('specialities')
         validated_data['user_role'] = 'doctor'

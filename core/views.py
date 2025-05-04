@@ -6,19 +6,23 @@ from appointments.serializer import AppointmentSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from utils.rolecheck import admin_only
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view, permission_classes
 # Create your views here.
 
-@login_required
+
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_doctors(request):
     doctors = Doctor.objects.all()
 
     speciality = request.query_params.get('speciality', None)
 
     if speciality:
-        query = Q(speciality__iexact = speciality)
+        query = Q(specialities__name__iexact = speciality)
         doctors = doctors.filter(query)
     
     if not doctors.exists():
@@ -31,6 +35,7 @@ def get_doctors(request):
     return Response(serializers.data, status=status.HTTP_200_OK)
 
 @login_required
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def view_appointments(request):
     appointments = Appointment.objects.all()
@@ -52,4 +57,25 @@ def view_appointments(request):
         )
 
     serializers = AppointmentSerializer(appointments, many=True)
+    return Response(serializers.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def add_speciality(request):
+    serializer = SpecialitySerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_specialities(request):
+    specialites = Speciality.objects.all()
+
+    serializers = SpecialitySerializer(specialites, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
