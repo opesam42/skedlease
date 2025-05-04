@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import USER_ROLE_CHOICES, Patient, Doctor
+from .models import USER_ROLE_CHOICES, Patient, Doctor, Speciality
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -35,3 +35,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             Doctor.objects.create(user=new_user)
             
         return new_user
+    
+class SpecialitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Speciality
+        fields = ['id', 'name']

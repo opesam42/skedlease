@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializer import UserRegistrationSerializer
+from .serializer import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from django.middleware.csrf import get_token
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
 
@@ -57,7 +59,7 @@ def logout_user(request):
 
 # Get User Data API (Requires Login)
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_user_data(request):
     return Response({
         'id': request.user.id,
@@ -70,4 +72,3 @@ def get_user_data(request):
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return Response({"csrf_token": csrf_token})
-    
