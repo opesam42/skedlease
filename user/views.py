@@ -12,20 +12,22 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
-
 @api_view(['POST'])
-# @permission_classes([AllowAny])  # Prevent JWT from blocking it
 def create_user(request):
+    role = request.data.get('user_role')
 
-    serializer = UserRegistrationSerializer(data=request.data)
+    if role == 'doctor':
+        serializer = DoctorRegistrationSerializer(data=request.data)
+    elif role == 'patient':
+        serializer = PatientRegistrationSerializer(data=request.data)
+    else:
+        return Response({'error': 'Invalid or missing user_role. Must be "doctor" or "patient".'}, status=status.HTTP_400_BAD_REQUEST)
 
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'message': f'{role.capitalize()} registered successfully.'}, status=status.HTTP_201_CREATED)
     
-    #in case of validation error
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['POST'])
 def login_view(request):

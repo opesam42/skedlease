@@ -39,8 +39,7 @@ class Speciality(models.Model):
 
 class Doctor(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    speciality = models.CharField(max_length=50, blank=True, null=True)
-    speciality = models.ManyToManyField(Speciality, related_name="doctor", blank=False)
+    specialities = models.ManyToManyField(Speciality, related_name="doctor", blank=False)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
@@ -48,7 +47,7 @@ class Doctor(models.Model):
 
 class Patient(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    matric_number = models.CharField(max_length=9, blank=False, null=True)
+    matric_number = models.CharField(max_length=9, unique=True, blank=False, null=True)
 
     def __str__(self):
         return f"Patient {self.user.first_name} {self.user.last_name}"
