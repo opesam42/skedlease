@@ -1,6 +1,9 @@
 from rest_framework import serializers
+from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 from .models import USER_ROLE_CHOICES, Patient, Doctor, Speciality
+from .generate_password import generate_random_password
+
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -13,12 +16,12 @@ class BaseUserSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name', 'phone_number', 'user_role', 'password', 'password2']
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        if attrs.get('password') and attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({'password': 'Passwords do not match'})
         return attrs
 
     def create_user(self, validated_data):
-        validated_data.pop('password2')
+        validated_data.pop('password2', None)
         user_model = get_user_model()
         return user_model.objects.create_user(**validated_data)
 
@@ -32,18 +35,38 @@ class PatientRegistrationSerializer(BaseUserSerializer):
     def create(self, validated_data):
         matric_number = validated_data.pop('matric_number')
         validated_data['user_role'] = 'patient'
-        user = self.create_user(validated_data)
-        Patient.objects.create(user=user, matric_number=matric_number)
+        
+        
+        try:
+            with transaction.atomic():
+                user = self.create_user(validated_data)
+                Patient.objects.create(user=user, matric_number=matric_number)
+        except IntegrityError as e:
+            if 'matric_number' in str(e):
+                raise serializers.ValidationError({'matric_number': 'This matric number already exists.'})
+            else:
+                raise serializers.ValidationError({'non_field_errors': ['There was an issue with the database. Please check your input and try again.']})
+
+
         return user
 
 
 class DoctorRegistrationSerializer(BaseUserSerializer):
+    password = 'doctor'
+    password2 = 'doctor'
+
     specialities = serializers.PrimaryKeyRelatedField(
         queryset=Speciality.objects.all(), many=True, write_only=True
     )
     
     class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + ['specialities']
+        base_fields = list(BaseUserSerializer.Meta.fields)
+        if 'password' in base_fields:
+            base_fields.remove('password')
+        if 'password2' in base_fields:
+            base_fields.remove('password2')
+            
+        fields = base_fields + ['specialities']
 
     def validate_specialities(self, value):
         if len(value) > 2:
@@ -53,10 +76,22 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
     def create(self, validated_data):
         specialities = validated_data.pop('specialities')
         validated_data['user_role'] = 'doctor'
+
+        generated_password = generate_random_password()
+        validated_data['password'] = generated_password
         user = self.create_user(validated_data)
         doctor = Doctor.objects.create(user=user)
         doctor.specialities.set(specialities)
+
+        user.generated_password = generated_password
         return user
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('password', None)
+        if hasattr(instance, 'generated_password'):
+            data['generated_password'] = instance.generated_password
+        return data
 
 
 
