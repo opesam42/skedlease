@@ -1,0 +1,42 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold" color="#333333">
+          Welcome to SkedlEase - Your Health Journey Begins Here!
+        </mj-text>
+        <mj-image width="300px" src="https://www.online-image-editor.com//styles/2014/images/example_image.png" />
+        <mj-text>
+          Dear {{user.first_name}},
+        </mj-text>
+        <mj-text>
+          Welcome to SkedlEase! We’re excited to have you join our community. Your health and well-being are our top priorities, and we're here to make your healthcare experience easy, efficient, and accessible.
+        </mj-text>
+        <mj-text>
+          <strong>Here’s what you can do now:</strong>
+        </mj-text>
+        <mj-list>
+          <mj-list-item>Set up your profile: Add your personal information to get started.</mj-list-item>
+          <mj-list-item>Book your first appointment: Browse available doctors and their schedules, and book your first appointment in just a few clicks.</mj-list-item>
+          <mj-list-item>Manage your appointments: Keep track of all your upcoming appointments in one place.</mj-list-item>
+          <mj-list-item>Access your health records: Once your appointment is complete, you can easily access your medical records and notes.</mj-list-item>
+        </mj-list>
+        <mj-text>
+          If you have any questions or need assistance, our support team is always here to help. Simply reply to this email or visit our Help Center.
+        </mj-text>
+        <mj-text>
+          Thank you for trusting SkedlEase with your health journey. We look forward to serving you!
+        </mj-text>
+        <mj-text>
+          Best regards,<br />
+          The SkedlEase Team
+        </mj-text>
+        <mj-divider border-color="#D1D1D1" />
+        <mj-text>
+          <strong>Support</strong><br />
+          If you have any questions or need assistance, don’t hesitate to reach out at <mj-link color="blue" href="mailto:skedlease@gmail.com">skedlease@gmail.com</mj-link>.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
