@@ -9,7 +9,6 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.rolecheck import admin_only
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, permission_classes
 # Create your views here.
 
@@ -34,7 +33,6 @@ def get_doctors(request):
     serializers = DoctorSerializer(doctors, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
-@login_required
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def view_appointments(request):

@@ -59,11 +59,7 @@ def login_view(request):
 
         return Response({
             'message': 'Login successful',
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'role': user.user_role
-            }
+            'user': BaseUserSerializer(user).data,
         })
     
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,11 +75,8 @@ def logout_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
-    return Response({
-        'id': request.user.id,
-        'email': request.user.email,
-        'role': request.user.user_role
-    })
+    user = request.user
+    return Response(BaseUserSerializer(user).data)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Prevent JWT from blocking it
