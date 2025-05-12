@@ -76,7 +76,7 @@ def logout_user(request):
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
     user = request.user
-    return Response(BaseUserSerializer(user).data)
+    return Response(UserDetailSerializer(user).data)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Prevent JWT from blocking it

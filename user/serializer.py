@@ -4,8 +4,6 @@ from django.contrib.auth import get_user_model
 from .models import USER_ROLE_CHOICES, Patient, Doctor, Speciality
 from .generate_password import generate_random_password
 
-
-
 class BaseUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
@@ -93,45 +91,36 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
             data['generated_password'] = instance.generated_password
         return data
 
-
-
-
-""" 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    password2 = serializers.CharField(write_only=True, required=True)
-    user_role = serializers.ChoiceField(choices=USER_ROLE_CHOICES, required=True)
-
+class PatientInfoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = get_user_model()
-        fields = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'user_role', 'password', 'password2']
+        model = Patient
+        fields = ['matric_number']
 
-    def validate(self, attrs):
-        # to ensure that passwords mathch
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({'password': 'Passwords do not match'})
-        if attrs['user_role'] == 'patient':
-            matric_number = self.initial_data.get('matric_number', None)
-            if not matric_number:
-                raise serializers.ValidationError({'matric_number': 'This field is required for patients.'})
-        return attrs
-    
-    def create(self, validated_data):
-        validated_data.pop('password2')
-        matric_number = self.initial_data.get('matric_number', None)
-        
-        user = get_user_model() 
-        new_user = user.objects.create_user(**validated_data)
-
-        user_role = validated_data.get('user_role')
-        if user_role == "patient":
-            Patient.objects.create(user=new_user, matric_number=matric_number)
-        elif user_role == "doctor":
-            Doctor.objects.create(user=new_user)
-            
-        return new_user
-    
 class SpecialitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Speciality
-        fields = ['id', 'name'] """
+        fields = ['id', 'name']
+
+class DoctorInfoSerializer(serializers.ModelSerializer):
+    specialities = SpecialitySerializer(many=True)
+
+    class Meta:
+        model = Doctor
+        fields = ['specialities', ]
+
+class UserDetailSerializer(BaseUserSerializer):
+    patient_info = serializers.SerializerMethodField()
+    doctor_info = serializers.SerializerMethodField()
+
+    class Meta(BaseUserSerializer.Meta):
+        fields = BaseUserSerializer.Meta.fields + ['patient_info', 'doctor_info']
+
+    def get_patient_info(self, obj):
+        if obj.user_role == "patient" and hasattr(obj, 'patient'):
+            return PatientInfoSerializer(obj.patient).data
+        return None
+    
+    def get_doctor_info(self, obj):
+        if obj.user_role == 'doctor' and hasattr(obj, 'doctor'):
+            return DoctorInfoSerializer(obj.doctor).data
+        return None 
