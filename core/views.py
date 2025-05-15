@@ -40,13 +40,16 @@ def view_appointments(request):
 
     patient = request.query_params.get('patient', None)
     doctor = request.query_params.get('doctor', None)
+    date = request.query_params.get('date', None)
 
     if patient:
         query = Q(patient__id = int(patient))
         appointments = appointments.filter(query)
+        appointments = appointments.filter(availability_slot__patient__id = int(patient))
     if doctor:
-        query = Q(doctor__id = int(doctor))
-        appointments = appointments.filter(query)
+        appointments = appointments.filter(availability_slot__doctor__id = int(doctor))
+    if date:
+        appointments = appointments.filter(availability_slot__date=date)
 
     if not appointments.exists():
         return Response(
