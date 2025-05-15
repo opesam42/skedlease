@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .serializers import *
 from user.models import Doctor
-from appointments.models import Appointment
-from appointments.serializer import AppointmentSerializer
+from appointments.models import Appointment, AvailabilitySlot
+from appointments.serializer import AppointmentSerializer, AvailabilitySlotSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -35,6 +35,35 @@ def get_doctors(request):
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
+def get_availabilty_slot(request):
+    availability_slots = AvailabilitySlot.objects.all()
+
+    date = request.query_params.get('date', None)
+    start_time = request.query_params.get('start_time', None)
+    end_time = request.query_params.get('end_time', None)
+
+    if date:
+        availability_slots = availability_slots.filter(date = date)
+
+    if start_time and end_time:
+        availability_slots = availability_slots.filter(
+            start_time__lte=start_time,
+            end_time__gte=end_time
+    )
+
+    availability_slots = availability_slots.first()
+    if not availability_slots:
+        return Response(
+            {'message': 'No slots found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializers = AvailabilitySlotSerializer(availability_slots)
+    return Response(serializers.data, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
 def view_appointments(request):
     appointments = Appointment.objects.all()
 
@@ -43,8 +72,6 @@ def view_appointments(request):
     date = request.query_params.get('date', None)
 
     if patient:
-        query = Q(patient__id = int(patient))
-        appointments = appointments.filter(query)
         appointments = appointments.filter(availability_slot__patient__id = int(patient))
     if doctor:
         appointments = appointments.filter(availability_slot__doctor__id = int(doctor))
