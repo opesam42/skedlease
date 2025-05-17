@@ -58,14 +58,14 @@ def get_availabilty_slot(request):
         available_slot_ids = []
         for slot in availability_slots:
             overlapping_appointments = Appointment.objects.filter(
-                availability_slots=slot,
+                availability_slot=slot,
                 start_time__lt=slot.end_time,
                 end_time__gt=slot.start_time,
             )
             if not overlapping_appointments.exists():
                 available_slot_ids.append(slot.id)
     
-    availability_slots = availability_slots.filter(id__in=available_slot_ids)
+        availability_slots = availability_slots.filter(id__in=available_slot_ids)
     
     if not availability_slots.exists():
         return Response(
@@ -102,6 +102,8 @@ def view_appointments(request):
     serializers = AppointmentSerializer(appointments, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
+
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_occupied_time(request, date):
     appointments = Appointment.objects.filter(availability_slot__date = date)
