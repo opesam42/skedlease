@@ -51,14 +51,14 @@ def get_availabilty_slot(request):
             end_time__gte=end_time
     )
 
-    availability_slots = availability_slots.first()
-    if not availability_slots:
+    
+    if not availability_slots.exists():
         return Response(
             {'message': 'No slots found'},
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serializers = AvailabilitySlotSerializer(availability_slots)
+    serializers = AvailabilitySlotSerializer(availability_slots, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
 
