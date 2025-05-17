@@ -43,6 +43,7 @@ def get_availabilty_slot(request):
     date = request.query_params.get('date', None)
     start_time = request.query_params.get('start_time', None)
     end_time = request.query_params.get('end_time', None)
+    available = request.query_params.get('available', None)
 
     if date:
         availability_slots = availability_slots.filter(date = date)
@@ -52,7 +53,19 @@ def get_availabilty_slot(request):
             start_time__lte=start_time,
             end_time__gte=end_time
     )
-
+        
+    if available is not None and available.lower() == 'true':
+        available_slot_ids = []
+        for slot in availability_slots:
+            overlapping_appointments = Appointment.objects.filter(
+                availability_slots=slot,
+                start_time__lt=slot.end_time,
+                end_time__gt=slot.start_time,
+            )
+            if not overlapping_appointments.exists():
+                available_slot_ids.append(slot.id)
+    
+    availability_slots = availability_slots.filter(id__in=available_slot_ids)
     
     if not availability_slots.exists():
         return Response(
