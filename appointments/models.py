@@ -74,4 +74,4 @@ class Appointment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.patient.user.first_name} / Dr. {self.availability_slot.doctor.user.first_name}'
+        return f'{self.patient.user.first_name} / Dr. {self.availability_slot.doctor.user.first_name} - {self.availability_slot.date}. {self.start_time} - {self.end_time}'
