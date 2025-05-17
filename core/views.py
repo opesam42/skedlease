@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.rolecheck import admin_only
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
+from collections import defaultdict
+from typing import List, DefaultDict
 # Create your views here.
 
 
@@ -86,6 +88,45 @@ def view_appointments(request):
 
     serializers = AppointmentSerializer(appointments, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_occupied_time(request, date):
+    appointments = Appointment.objects.filter(availability_slot__date = date)
+    slots = AvailabilitySlot.objects.filter(date = date)
+    time_slot_dict:DefaultDict[time, List[str]] = defaultdict(list)
+
+    for appointment in appointments:
+        for slot in slots:
+            if(appointment.start_time >= slot.start_time) and (appointment.end_time <= slot.end_time):
+                if(slot.id != appointment.availability_slot.id):
+                    time_slot_dict[appointment.start_time].append('free')
+                else:
+                    time_slot_dict[appointment.start_time].append('occupied')
+        
+    print("Time Slot Dict", time_slot_dict)
+
+    from datetime import timedelta, datetime
+
+    occupied_only_slots = []
+
+    for t, status_list in time_slot_dict.items():
+        if all(status == 'occupied' for status in status_list):
+            # Create datetime object to add 20 minutes
+            start_dt = datetime.combine(datetime.today(), t)
+            end_dt = start_dt + timedelta(minutes=20)
+
+            start_time_str = start_dt.strftime("%H:%M")
+            end_time_str = end_dt.strftime("%H:%M")
+            time_range_str = f"{start_time_str} - {end_time_str}"
+
+            occupied_only_slots.append({
+                "start_time": start_time_str,
+                "end_time": end_time_str,
+                "time_range": time_range_str,
+                "status": "occupied"
+            })
+
+    return Response({'occupied_time_slots': occupied_only_slots})
 
 
 @api_view(['POST'])
