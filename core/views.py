@@ -72,7 +72,7 @@ def view_appointments(request):
     date = request.query_params.get('date', None)
 
     if patient:
-        appointments = appointments.filter(availability_slot__patient__id = int(patient))
+        appointments = appointments.filter(patient__id = int(patient))
     if doctor:
         appointments = appointments.filter(availability_slot__doctor__id = int(doctor))
     if date:
