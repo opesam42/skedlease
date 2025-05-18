@@ -18,6 +18,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 class PatientSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
     class Meta:
         model = Patient
         fields = ['id', 'user', 'matric_number']
