@@ -40,7 +40,7 @@ class Speciality(models.Model):
 
 class Doctor(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    specialities = models.ManyToManyField(Speciality, related_name="doctor", blank=False)
+    specialities = models.ManyToManyField(Speciality, related_name="doctor", blank=True)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"

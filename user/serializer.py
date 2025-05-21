@@ -55,7 +55,7 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
     password2 = 'doctor'
 
     specialities = serializers.PrimaryKeyRelatedField(
-        queryset=Speciality.objects.all(), many=True, write_only=True
+        queryset=Speciality.objects.all(), many=True, write_only=True, required=False
     )
     
     class Meta(BaseUserSerializer.Meta):
@@ -68,12 +68,12 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
         fields = base_fields + ['specialities']
 
     def validate_specialities(self, value):
-        if len(value) > 2:
+        if value and len(value) > 2:
             raise serializers.ValidationError("A doctor can have at most 2 specialities")
         return value
 
     def create(self, validated_data):
-        specialities = validated_data.pop('specialities')
+        specialities = validated_data.pop('specialities', [])
         validated_data['user_role'] = 'doctor'
 
         generated_password = generate_random_password()
