@@ -1,0 +1,48 @@
+<mjml>
+  <mj-body background-color="#f9f9f9">
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold" color="#333333">
+          Welcome to SkedlEase, Dr. {{doctor.last_name}}!
+        </mj-text>
+        <mj-image width="300px" src="https://www.online-image-editor.com//styles/2014/images/example_image.png" />
+        <mj-text font-size="16px" color="#333333">
+          Dear Dr. {{doctor.last_name}},
+        </mj-text>
+        <mj-text font-size="16px" color="#333333">
+          You've been successfully added to the SkedlEase platform by your hospital's administration. We're excited to have you on board to help improve patient care through efficient scheduling and communication.
+        </mj-text>
+
+        <mj-text font-size="16px" color="#333333">
+          <strong>Your login credentials:</strong><br/>
+          <strong>Email:</strong> {{doctor.email}}<br/>
+          <strong>Temporary Password:</strong> <span style="color: #d9534f;"><strong>{{doctor.generated_password}}</strong></span>
+        </mj-text>
+
+        <mj-text font-size="16px" color="#333333">
+          For security reasons, please log in and change your password as soon as possible.
+        </mj-text>
+
+        <mj-text font-size="16px" color="#333333">
+          If you need any assistance, feel free to reply to this email or contact our support team.
+        </mj-text>
+
+        <mj-divider border-color="#D1D1D1" />
+
+        <mj-text font-size="16px" color="#333333">
+          <strong>Support</strong><br/>
+          Email us at <mj-link color="blue" href="mailto:skedlease@gmail.com">skedlease@gmail.com</mj-link> or visit our Help Center.
+        </mj-text>
+
+        <mj-text font-size="16px" color="#333333">
+          Welcome again, and thank you for being part of the SkedlEase medical community!
+        </mj-text>
+
+        <mj-text font-size="16px" color="#333333">
+          Best regards,<br/>
+          The SkedlEase Team
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

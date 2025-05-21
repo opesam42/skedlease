@@ -3,6 +3,7 @@ from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 from .models import USER_ROLE_CHOICES, Patient, Doctor, Speciality
 from .generate_password import generate_random_password
+from emails.utils import send_doctor_welcome_email
 
 class BaseUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -82,6 +83,13 @@ class DoctorRegistrationSerializer(BaseUserSerializer):
         doctor.specialities.set(specialities)
 
         user.generated_password = generated_password
+
+        # send email
+        try:
+            send_doctor_welcome_email(user.email, {'doctor': user})
+            print(f'Welcome Email sent to Dr. {user.first_name}')
+        except Exception as e:
+            print(f'Error sending mail', {str(e)})
         return user
     
     def to_representation(self, instance):

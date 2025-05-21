@@ -10,7 +10,6 @@ from rest_framework.permissions import AllowAny
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from .models import Patient
-from emails.utils import send_welcome_email
 
 # Create your views here.
 User = get_user_model()
@@ -27,12 +26,7 @@ def create_user(request):
         return Response({'error': 'Invalid or missing user_role. Must be "doctor" or "patient".'}, status=status.HTTP_400_BAD_REQUEST)
 
     if serializer.is_valid():
-        user = serializer.save()
-
-        # send email
-        if user.user_role == 'patient':
-            send_welcome_email(user.email, {"user": user})
-        # TODO - Change to normal message or data + normal success message
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
