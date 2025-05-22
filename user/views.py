@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from .models import Patient
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 User = get_user_model()
@@ -71,6 +72,36 @@ def logout_user(request):
 def get_user_data(request):
     user = request.user
     return Response(UserDetailSerializer(user).data)
+
+@api_view(['PUT'])
+@permission_classes(IsAuthenticated)
+def update_user(request):
+    user = request.user
+    serializer = UserDetailSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# for admin to updte user
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def admin_update_user(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Prevent JWT from blocking it

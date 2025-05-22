@@ -12,6 +12,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('info/', views.get_user_data, name='get_user_data'),
+    path('update/<int:user_id>/', views.admin_update_user, name='admin-update-user'),
 
     path('get_csrf/', views.get_csrf_token, name='get_csrf_token'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
